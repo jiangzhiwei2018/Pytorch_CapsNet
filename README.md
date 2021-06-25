@@ -16,5 +16,8 @@ torchvision==0.9.1+cu102
 
 numpy==1.19.2
 
+## run
+`python main.py`
+
 
 
