@@ -17,7 +17,7 @@ to_pil_image = transforms.ToPILImage()
 
 
 class MyMnistDataset(Dataset):
-    def __init__(self, data_dir=r"./data_src/MNIST", train=True):
+    def __init__(self, data_dir=r"./data_src", train=True):
         """
 
         :param data_dir:

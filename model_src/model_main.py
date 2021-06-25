@@ -19,7 +19,7 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 
 class MainModule(nn.Module):
 
-    def __init__(self, data_dir=r"./data_src/MNIST", bs=32, num_epochs=10):
+    def __init__(self, data_dir=r"./data_src", bs=32, num_epochs=10):
         super(MainModule, self).__init__()
         self.num_epochs = num_epochs
         self.train_dl = DataLoader(load_dataset_main.MyMnistDataset(data_dir=data_dir, train=True), shuffle=True,
