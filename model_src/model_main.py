@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from model_src import bease_capsuleNet
 from load_data_src import load_dataset_main
 import copy
+import os
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
@@ -19,7 +20,7 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 
 class MainModule(nn.Module):
 
-    def __init__(self, data_dir=r"./data_src", bs=32, num_epochs=10):
+    def __init__(self, data_dir=r"./data_src", bs=32, num_epochs=10, save_dir="./checkpoint"):
         super(MainModule, self).__init__()
         self.num_epochs = num_epochs
         self.train_dl = DataLoader(load_dataset_main.MyMnistDataset(data_dir=data_dir, train=True), shuffle=True,
@@ -29,6 +30,9 @@ class MainModule(nn.Module):
         self.net = bease_capsuleNet.BaseCapsuleNet().to(device=device)
         self.optimizer = optim.Adam(filter(lambda p: p.requires_grad, self.net.parameters()), lr=0.001)
         self.loss_func = bease_capsuleNet.Margin_loss()
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        self.save_pth = os.path.join(save_dir, "final_model.pt")
         self.model_fit()
 
     def model_fit(self):
@@ -79,6 +83,8 @@ class MainModule(nn.Module):
                 # all_cnt = all_cnt + 1
                 # if all_cnt % 10 != 0:
                 #     continue
+            torch.save(self.net.to(device=torch.device("cpu")), self.save_pth)
+            self.net.to(device=device)
             with torch.no_grad():
                 test_loss, test_acc = eval_func(self.net, self.test_dl)
                 print(f"test_loss:{test_loss}, test_acc={test_acc}")

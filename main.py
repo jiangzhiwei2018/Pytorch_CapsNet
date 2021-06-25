@@ -4,7 +4,5 @@ from utils import random_utils
 
 if __name__ == '__main__':
     random_utils.set_seed(2)
-    # load_dataset_main.load_mnist_dataset()
-    # load_dataset_main.MyMnistDataset()
-    model_main.MainModule()
+    model_main.MainModule(num_epochs=50, save_dir="./checkpoint")
 
