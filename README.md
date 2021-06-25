@@ -12,7 +12,7 @@ A Pytorch implementation of CapsNet based on Geoffrey Hinton's paper [Dynamic Ro
 
 torch==1.8.1
 
-torchvision==0.9.1+cu102
+torchvision==0.9.1
 
 numpy==1.19.2
 
