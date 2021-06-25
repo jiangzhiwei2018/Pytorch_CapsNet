@@ -1,17 +1,11 @@
 import torch
-import torchvision
 import torch.nn as nn
 import numpy as np
 from torch.nn import functional as F
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader, Dataset
-from torchvision import transforms
-from PIL import Image
-from utils import random_utils
-import matplotlib.pyplot as plt
 from model_src import bease_capsuleNet
 from load_data_src import load_dataset_main
-import copy
 import os
 
 use_cuda = torch.cuda.is_available()

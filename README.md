@@ -10,16 +10,11 @@ A Pytorch implementation of CapsNet based on Geoffrey Hinton's paper [Dynamic Ro
 
 ## Requirements
 
--torch==1.8.1+cu102
+torch==1.8.1
 
--numpy==1.19.2
+torchvision==0.9.1+cu102
 
--torchvision==0.9.1
-
--matplotlib==3.3.3
-
--Pillow==8.2.0
-
+numpy==1.19.2
 
 
 
