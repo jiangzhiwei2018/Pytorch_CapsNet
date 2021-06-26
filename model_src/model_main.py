@@ -14,12 +14,14 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 
 class MainModule(nn.Module):
 
-    def __init__(self, data_dir=r"./data_src", bs=32, num_epochs=10, save_dir="./checkpoint"):
+    def __init__(self, data_dir=r"./data_src", bs=32, num_epochs=10, save_dir="./checkpoint", **kwargs):
         super(MainModule, self).__init__()
         self.num_epochs = num_epochs
-        self.train_dl = DataLoader(load_dataset_main.MyMnistDataset(data_dir=data_dir, train=True), shuffle=True,
+        self.train_dl = DataLoader(load_dataset_main.MyMnistDataset(data_dir=data_dir, train=True, **kwargs),
+                                   shuffle=True,
                                    batch_size=bs)
-        self.test_dl = DataLoader(load_dataset_main.MyMnistDataset(data_dir=data_dir, train=False), shuffle=True,
+        self.test_dl = DataLoader(load_dataset_main.MyMnistDataset(data_dir=data_dir, train=False, **kwargs),
+                                  shuffle=True,
                                   batch_size=bs)
         self.net = bease_capsuleNet.BaseCapsuleNet().to(device=device)
         self.optimizer = optim.Adam(filter(lambda p: p.requires_grad, self.net.parameters()), lr=0.001)

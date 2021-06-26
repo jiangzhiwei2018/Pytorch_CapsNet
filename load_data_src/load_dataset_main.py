@@ -11,7 +11,7 @@ to_pil_image = transforms.ToPILImage()
 
 
 class MyMnistDataset(Dataset):
-    def __init__(self, data_dir=r"./data_src", train=True):
+    def __init__(self, data_dir=r"./data_src", train=True, download=False):
         """
 
         :param data_dir:
@@ -26,7 +26,7 @@ class MyMnistDataset(Dataset):
             train=train,  # train用于指定在数据集下载完成后需要载入哪部分数据，如果设置为True
             # ，则说明载入的是该数据集的训练集部分；如果设置为False，则说明载入的是该数据集的测试集部分。
             transform=trans,  # 数据的标准化等操作都在transforms中，此处是转换
-            download=False  # 瞎子啊过程中如果中断，或者下载完成之后再次运行，则会出现报错
+            download=download  # 瞎子啊过程中如果中断，或者下载完成之后再次运行，则会出现报错
         )
         self.data_images = dataset.data.unsqueeze(dim=1).float()
         self.data_labels = dataset.targets
