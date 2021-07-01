@@ -13,22 +13,31 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 
 
 class MainModule(nn.Module):
-
-    def __init__(self, data_dir=r"./data_src", bs=32, num_epochs=10, save_dir="./checkpoint", **kwargs):
+    def __init__(self, data_dir, dataset_name, bs=32, num_epochs=10, save_dir="./checkpoint", num_classes=10,
+                 **kwargs):
         super(MainModule, self).__init__()
         self.num_epochs = num_epochs
-        self.train_dl = DataLoader(load_dataset_main.MyMnistDataset(data_dir=data_dir, train=True, **kwargs),
+        assert dataset_name in ["MNIST", "CIFAR", "ImageNet"]
+        dataset_dict = {
+            "MNIST": {"dataset": load_dataset_main.MNISTDataset, "in_channel": 1},
+            "CIFAR": {"dataset": load_dataset_main.CIFARDataset, "in_channel": 3},
+            "ImageNet": {"dataset": load_dataset_main.ImageNetDataset, "in_channel": 3}
+        }
+        dataset = dataset_dict[dataset_name]
+        self.train_dl = DataLoader(dataset["dataset"](data_dir=data_dir, train=True, num_classes=num_classes, **kwargs),
                                    shuffle=True,
                                    batch_size=bs)
-        self.test_dl = DataLoader(load_dataset_main.MyMnistDataset(data_dir=data_dir, train=False, **kwargs),
+        self.test_dl = DataLoader(dataset["dataset"](data_dir=data_dir, train=False, num_classes=num_classes, **kwargs),
                                   shuffle=True,
                                   batch_size=bs)
-        self.net = bease_capsuleNet.BaseCapsuleNet().to(device=device)
+        self.net = bease_capsuleNet.BaseCapsuleNet(num_classes=num_classes,
+                                                   in_channel=dataset["in_channel"]).to(device=device)
+
         self.optimizer = optim.Adam(filter(lambda p: p.requires_grad, self.net.parameters()), lr=0.001)
         self.loss_func = bease_capsuleNet.Margin_loss()
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        self.save_pth = os.path.join(save_dir, "final_model.pt")
+        self.save_pth = os.path.join(save_dir, f"{dataset_name}_{num_classes}_dataset_final_model.pt")
         self.model_fit()
 
     def model_fit(self):
@@ -56,14 +65,15 @@ class MainModule(nn.Module):
                 pred_labels = self.predict(batch_x).cpu().detach().numpy()
                 acc = cal_acc(pred_labels, batch_y_label)
                 all_acc += acc
-                cnt = idx+1
-            return all_loss/cnt, all_acc/cnt
+                cnt = idx + 1
+            return all_loss / cnt, all_acc / cnt
 
         min_loss = float("inf")
         all_cnt = 0
         for epoch in range(self.num_epochs):
             for train_idx, (train_batch_x, train_batch_y_one_hot, train_batch_y_label) in enumerate(self.train_dl):
                 self.net.train()
+                print(train_batch_x.size())
                 train_batch_x, train_batch_y_one_hot, train_batch_y_label = \
                     train_batch_x.to(device), train_batch_y_one_hot.to(device), \
                     train_batch_y_label.cpu().detach().numpy()
@@ -75,7 +85,7 @@ class MainModule(nn.Module):
                 train_loss.backward()
                 self.optimizer.step()
                 self.net.eval()
-                print(f"epoch={epoch}, train_loss={train_loss.data}")
+                # print(f"epoch={epoch}, train_loss={train_loss.data}")
                 # all_cnt = all_cnt + 1
                 # if all_cnt % 10 != 0:
                 #     continue
@@ -108,8 +118,3 @@ def cal_acc(pred, real_label):
     :return:
     """
     return np.equal(pred, real_label).mean()
-
-
-
-
-

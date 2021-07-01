@@ -183,7 +183,7 @@ class RoutingBase(nn.Module):
 
 
 class BaseCapsuleNet(nn.Module):
-    def __init__(self, in_channel=1, out_dims=16, num_classes=10,
+    def __init__(self, in_channel=3, out_dims=16, num_classes=10,
                  hidden_channels=8, num_routing_iterations=2,
                  num_primary_conv_units=32):
         super(BaseCapsuleNet, self).__init__()
@@ -213,16 +213,18 @@ class BaseCapsuleNet(nn.Module):
         out1 = torch.relu(self.conv1(inx))
         out1 = self.primary_capsules(out1)
         out1 = out1.flatten(1, 3)
-        # if self.num_size != out1.size(1):
-        #     self.num_size = out1.size(1)
-        #     now_device = self.my_linear.weight.device
-        #     self.my_linear = MyLinear(in_features=self.hidden_channels,
-        #                               out_features=self.out_dims,
-        #                               num_classes=self.num_classes,
-        #                               nums=self.num_size).to(device=now_device)
+        if self.num_size != out1.size(1):
+            self.num_size = out1.size(1)
+            print(self.num_size)
+            now_device = self.my_linear.weight.device
+            self.my_linear = MyLinear(in_features=self.hidden_channels,
+                                      out_features=self.out_dims,
+                                      num_classes=self.num_classes,
+                                      nums=self.num_size).to(device=now_device)
         out1 = self.my_linear(out1)
         # print(out1.size())
         out1 = self.routing_base(out1)
+        # print(out1[1].size())
         return out1
 
 
